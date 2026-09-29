@@ -4,8 +4,8 @@ on:
   pull_request_target:
     branches: [main]
     paths:
-      - 'domain.txt'
       - 'mirror.txt'
+      - 'allows.txt'
 
 permissions:
   issues: write
@@ -21,46 +21,16 @@ jobs:
       - uses: actions/checkout@v4
       - name: Commit PR
         run: |
-          git config --global user.name "bot"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           wget -O pr.patch https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}.patch && \
             git am -3 pr.patch &&
             rm -rf pr.patch
 
-      - name: Verify domain.txt
-        run: |
-          ./hack/verify-fmt.sh domain.txt || {
-            echo "Please run './hack/fmt.sh domain.txt'"
-            gh pr comment "${{ github.event.pull_request.number }}" --body '请运行 `./hack/fmt.sh domain.txt` 对内容进行排序'
-            exit 1
-          }
-
-      - name: Verify mirror.txt image
-        run: |
-          ./hack/verify-fmt-image.sh mirror.txt || {
-            echo "Please run './hack/fmt-image.sh mirror.txt'"
-            gh pr comment "${{ github.event.pull_request.number }}" --body '请运行 `./hack/fmt-image.sh mirror.txt` 对内容进行格式化'
-            exit 1
-          }
-
-      - name: Verify mirror.txt sort
-        run: |
-          ./hack/verify-fmt.sh mirror.txt || {
-            echo "Please run './hack/fmt.sh mirror.txt'"
-            gh pr comment "${{ github.event.pull_request.number }}" --body '请运行 `./hack/fmt.sh mirror.txt` 对内容进行排序'
-            exit 1
-          }
-
       - name: Verify allows.txt sort
         run: |
-          ./hack/verify-fmt.sh allows.txt || {
-            echo "Please run './hack/fmt.sh allows.txt'"
-            gh pr comment "${{ github.event.pull_request.number }}" --body '请运行 `./hack/fmt.sh allows.txt` 对内容进行排序'
-            exit 1
-          }
-
-      - name: Verify Image Exists
-        run: |
-          ./hack/verify-image.sh mirror.txt https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}.patch || {
-            gh pr comment "${{ github.event.pull_request.number }}" --body '有镜像不存在请检查后重新提交'
+          ./hack/verify-image-match.sh allows.txt || {
+            echo "Please run './hack/fmt-image-match.sh allows.txt'"
+            gh pr comment "${{ github.event.pull_request.number }}" --body '请运行 `./hack/fmt-image-match.sh allows.txt` 对内容进行排序'
             exit 1
           }

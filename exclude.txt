@@ -1,8 +1,0 @@
-.*[0-9a-f]{10,}.*
-.*-g[0-9a-f]{7,}.*
-.*SNAPSHOT.*
-.*dev-.*
-.*sha256-.*
-.*distroless.*
-.*alpha.*
-.*beta.*
